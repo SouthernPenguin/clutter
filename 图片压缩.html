@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <input type="file" id="upImg" />
+  <script>
+    const upImg = document.getElementById('upImg')
+    const MAXSIZE = 1.5 * 1024 * 1024
+    const MAXSIZE_RST = '1.5M'
+    upImg.addEventListener('change', (e) => {
+      const [file] = e.target.files
+      if (!file) return
+      const {
+        size,
+        type
+      } = file
+      if (size > MAXSIZE) {
+        upImg.value = ''
+        // alert(`上传的图片大于${MAXSIZE_RST}`)
+        // return
+      }
+      converImageToBase64(file, (base64Image) => compress(base64Image, upLoadToServer))
+    })
+
+    // 将图片转换成Base64
+    function converImageToBase64(file, callBack) {
+      let reader = new FileReader()
+      reader.addEventListener('load', (e) => {
+        const base64Image = e.currentTarget.result
+        callBack && callBack(base64Image)
+        reader = null
+      })
+      reader.readAsDataURL(file)
+    }
+    //压缩图片
+    function compress(base64Image, callBack) {
+      const img = new Image()
+      let maxW = 1024
+      let maxH = 1024
+      img.addEventListener('load', () => {
+        let ratio //图片压缩比
+        let neddComperess = false //判断是否需要压缩
+        if (img.naturalWidth > maxW) {
+          neddComperess = true
+          ratio = img.naturalWidth / maxW
+          maxH = img.naturalHeight / ratio
+        }
+        if (img.naturalHeight > maxH) {
+          neddComperess = true
+          ratio = img.naturalHeight / maxH
+          maxW = img.naturalWidth / ratio
+        }
+        if (!neddComperess) {
+          maxH = img.naturalHeight
+          maxW = img.naturalWidth
+        }
+        const canves = document.createElement('canvas')
+        canves.setAttribute('id', '__compress__')
+        canves.width = maxW
+        canves.height = maxH
+        canves.style.visibility = 'hidden'
+        document.body.appendChild(canves)
+
+        const ctx = canves.getContext("2d")
+        ctx.clearRect(0, 0, maxW, maxH)
+        ctx.drawImage(img, 0, 0, maxW, maxH)
+        const compressImge = canves.toDataURL('image/png', .1)
+
+        callBack && callBack(compressImge)
+        const _img = new Image()
+        _img.src = compressImge
+        document.body.appendChild(_img)
+        canves.remove()
+      })
+      img.src = base64Image
+      document.body.appendChild(img)
+    }
+
+    function upLoadToServer(compressImge) {
+      console.log(compressImge);
+    }
+  </script>
+</body>
+
+</html>
