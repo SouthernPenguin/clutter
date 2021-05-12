@@ -1,3 +1,4 @@
+
 Page({
   data: {
     canvasDom: '',
@@ -14,14 +15,55 @@ Page({
     // photoUrl: 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201901%2F14%2F20190114004816_nhtgr.thumb.700_0.jpeg&refer=http%3A%2F%2Fb-ssl.duitang.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1622870740&t=fd8f6a67806838551232c99cade0f4d5', //头像图片路径
     QRCover: '/img/QR.jpg',
     iconCover: '/img/icon.png',
-    w: 670, //实际像素px
-    h: 1150 //实际像素px
+    w: 668, //实际像素px
+    h: 1140 //实际像素px
+    // h: 1150 //实际像素px
     // h: 1120 //实际像素px
     // h: 956 //实际像素px
   },
   onReady() {
     this.drawImage()
   },
+  gwe() {
+  },
+  saver() {
+    let {
+      w,
+      h
+    } = this.data
+    wx.canvasToTempFilePath({
+      x: 0,
+      y: 0,
+      width: w,
+      height: h,
+      destWidth: w,
+      destHeight: h,
+      canvas: this.data.canvas,
+      success(res) {
+        console.log(res)
+        wx.saveImageToPhotosAlbum({ //保存图片到相册
+          filePath: res.tempFilePath,
+          success: function () {
+            wx.showToast({
+              title: "生成图片成功！",
+              duration: 2000
+            })
+          }
+        })
+      },
+      fail: (err) => {
+        console.log(err)
+        wx.showToast({
+          title: '网络错误,请稍后再试'
+        })
+      }
+    })
+  },
+
+
+
+
+
   drawImage() {
     const query = wx.createSelectorQuery() // 创建一个dom元素节点查询器
     query.select('#myCanvas') // 选择我们的canvas节点
@@ -29,8 +71,10 @@ Page({
         node: true, // 是否返回节点对应的 Node 实例
         size: true // 是否返回节点尺寸（width height）
       }).exec((res) => {
+        console.log(res)
         const dom = res[0] // 因为页面只存在一个画布，所以我们要的dom数据就是 res数组的第一个元素
         const canvas = dom.node // canvas就是我们要操作的画布节点
+        console.log(canvas)
         const ctx = canvas.getContext('2d') // 以2d模式，获取一个画布节点的上下文对象
         const dpr = wx.getSystemInfoSync().pixelRatio // 获取设备的像素比，未来整体画布根据像素比扩大
         this.setData({
@@ -66,7 +110,8 @@ Page({
     const ctx = that.data.canvas.getContext('2d')
     return new Promise((resolve, reject) => {
       that.computeCanvasSize(that.data.w / this.data.dpr, that.data.h / this.data.dpr).then(res => {
-        ctx.fillStyle = 'green'
+        ctx.fillStyle = '#FFF'
+        // ctx.fillStyle = '#EDEDED'
         ctx.fillRect(0, 30, res.width, res.height)
         resolve()
       })
@@ -328,11 +373,11 @@ Page({
     const ctx = this.data.canvas.getContext('2d')
     ctx.fillStyle = 'white'
     ctx.fillRect(0, 388, canvasWidth, 122)
-    
+
     this.AAA()
     myData.ctx.restore();
 
-   
+
 
     let photoDiam = 160 / 2
     let photo = myData.canvas.createImage(); // 创建一个图片对象
@@ -343,7 +388,7 @@ Page({
       myData.ctx.drawImage(photo, 0, 0, photo.width, photo.height, x, y, photoDiam, photoDiam) // 详见 drawImage 用法
     }
 
-  
+
 
   },
   drawQRtext() {
@@ -363,7 +408,7 @@ Page({
     let sloganY = 472 //450
     myData.ctx.fillText('XXXX', sloganX, sloganY);
   },
-  AAA(){
+  AAA() {
     const myData = this.data
     let {
       canvasWidth
