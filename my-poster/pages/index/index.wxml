@@ -1,0 +1,5 @@
+<!-- <view class='poste_content' id='canvas-container'> -->
+<canvas id="myCanvas" type="2d" style="width:335px;height:478px;"></canvas>
+<!-- </view> -->
+
+<!-- 海报 670*956 -->

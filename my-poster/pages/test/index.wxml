@@ -1,0 +1,2 @@
+<canvas id="myCanvas" type="2d" style="width:{{canvasWidth}}px;height:{{canvasHeight}}px;"></canvas>
+

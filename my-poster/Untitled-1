@@ -1,0 +1,29 @@
+
+var Point = function(x, y) {
+    return {x:x, y:y};
+};
+ 
+var rect = Rect(50, 50, 300, 200);
+ 
+drawRoundedRect(rect, 25, ctx);
+ 
+function drawRoundedRect(rect, r, ctx) {
+    var ptA = Point(rect.x + r, rect.y);
+    var ptB = Point(rect.x + rect.width, rect.y);
+    var ptC = Point(rect.x + rect.width, rect.y + rect.height);
+    var ptD = Point(rect.x, rect.y + rect.height);
+    var ptE = Point(rect.x, rect.y);
+    
+    ctx.beginPath();
+    
+    ctx.moveTo(ptA.x, ptA.y);
+    ctx.arcTo(ptB.x, ptB.y, ptC.x, ptC.y, r);
+    ctx.arcTo(ptC.x, ptC.y, ptD.x, ptD.y, r);
+    ctx.arcTo(ptD.x, ptD.y, ptE.x, ptE.y, r);
+    ctx.arcTo(ptE.x, ptE.y, ptA.x, ptA.y, r);
+ 
+    ctx.stroke();
+}
+————————————————
+版权声明：本文为CSDN博主「Sarkuya」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/sarkuya/article/details/49793531
