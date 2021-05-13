@@ -1,0 +1,46 @@
+.shade {
+
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, .6);
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9;
+}
+
+.canves-box {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.canves {
+  width: 750rpx;
+  height: 1036rpx;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.canves-btn {
+  box-sizing: border-box;
+  overflow: hidden;
+  padding: 0 40rpx;
+  height: 100rpx;
+  line-height: 100rpx;
+  width: 100vw;
+  display: flex;
+  justify-content: space-between;
+}
+
+.canves-btn view {
+  height: 100%;
+  text-align: center;
+  box-sizing: border-box;
+  overflow: hidden;
+  width: 250rpx;
+  color: white;
+  background-color: rgb(7, 193, 96);
+}

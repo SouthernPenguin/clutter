@@ -16,10 +16,12 @@ Page({
     QRCover: '/img/QR.jpg',
     iconCover: '/img/icon.png',
     w: 668, //实际像素px
-    h: 1140 //实际像素px
+    h: 1140, //实际像素px
     // h: 1150 //实际像素px
     // h: 1120 //实际像素px
     // h: 956 //实际像素px
+    tempFilePath:'',
+    isShade:false
   },
   onReady() {
     this.drawImage()
@@ -27,10 +29,11 @@ Page({
   gwe() {
   },
   saver() {
+    let that = this
     let {
       w,
       h
-    } = this.data
+    } = that.data
     wx.canvasToTempFilePath({
       x: 0,
       y: 0,
@@ -38,18 +41,22 @@ Page({
       height: h,
       destWidth: w,
       destHeight: h,
-      canvas: this.data.canvas,
+      canvas: that.data.canvas,
       success(res) {
         console.log(res)
-        wx.saveImageToPhotosAlbum({ //保存图片到相册
-          filePath: res.tempFilePath,
-          success: function () {
-            wx.showToast({
-              title: "生成图片成功！",
-              duration: 2000
-            })
-          }
+        that.setData({
+          tempFilePath:res.tempFilePath,
+          isShade:true
         })
+        // wx.saveImageToPhotosAlbum({ //保存图片到相册
+        //   filePath: res.tempFilePath,
+        //   success: function () {
+        //     wx.showToast({
+        //       title: "生成图片成功！",
+        //       duration: 2000
+        //     })
+        //   }
+        // })
       },
       fail: (err) => {
         console.log(err)
@@ -374,7 +381,7 @@ Page({
     ctx.fillStyle = 'white'
     ctx.fillRect(0, 388, canvasWidth, 122)
 
-    this.AAA()
+    this.drawLine()
     myData.ctx.restore();
 
 
@@ -408,17 +415,17 @@ Page({
     let sloganY = 472 //450
     myData.ctx.fillText('XXXX', sloganX, sloganY);
   },
-  AAA() {
+  drawLine() {
     const myData = this.data
     let {
       canvasWidth
     } = myData
-    myData.ctx.lineWidth = 3;
-    myData.ctx.setLineDash([5, 15]);
+    myData.ctx.lineWidth = 2;
+    myData.ctx.setLineDash([3, 10]);
     myData.ctx.strokeStyle = '#EDEDED';
     myData.ctx.beginPath();
-    myData.ctx.moveTo(10, 388);
-    myData.ctx.lineTo(canvasWidth - 10, 388);
+    myData.ctx.moveTo(0, 388);
+    myData.ctx.lineTo(canvasWidth, 388);
     myData.ctx.stroke();
   }
 })

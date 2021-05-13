@@ -1,4 +1,10 @@
 <canvas   type="2d" id="myCanvas"style="width:{{canvasWidth}}px;height:{{canvasHeight}}px;"></canvas>
 
+<!-- <view class="poster-shade" wx:if="{{isShade}}">
+  <image src="{{tempFilePath}}" mode="widthFix" style="    height:900rpx;"></image>
+</view> -->
+
+
+
 <button catchtap="saver">保存</button>
 <button catchtap="gwe">生产海报</button>

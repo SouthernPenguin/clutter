@@ -1,0 +1,18 @@
+<view class="shade">
+  <view class="canves-box">
+    <view class="canves" id="canves">
+      <canvas type="2d" id="myCanvas" style="width:100%;height:100%;"></canvas>
+    </view>
+    <view class="canves-btn">
+      <view>1</view>
+      <view>2</view>
+    </view>
+  </view>
+</view>
+
+<!-- <view class="canves-btn">
+  <view catchtap="close">保存海报</view>
+  <view>分享到朋友圈</view>
+</view> -->
+
+<!-- <poster /> -->
