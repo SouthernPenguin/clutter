@@ -1,4 +1,4 @@
-<view class="shade">
+<!-- <view class="shade">
   <view class="canves-box">
     <view class="canves" id="canves">
       <canvas type="2d" id="myCanvas" style="width:100%;height:100%;"></canvas>
@@ -8,11 +8,14 @@
       <view>2</view>
     </view>
   </view>
-</view>
+</view> -->
 
 <!-- <view class="canves-btn">
   <view catchtap="close">保存海报</view>
   <view>分享到朋友圈</view>
 </view> -->
 
-<!-- <poster /> -->
+<poster userHeader="https://img2.woyaogexing.com/2017/12/08/f17dfece59f86bdc!400x400_big.jpg"
+  cover="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fattach.bbs.miui.com%2Fforum%2F201305%2F11%2F212813ql8v5igl9cjt8vmb.jpg&refer=http%3A%2F%2Fattach.bbs.miui.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1622943556&t=410e2aa589c10510150cd8ce627be71b"
+  QRcode="/img/QR.png"
+  classInform="{{classInform}}" />

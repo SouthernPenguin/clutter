@@ -1,4 +1,10 @@
+.relay{
+  height: 150rpx;
+  background-color: rgb(7, 193, 96);
+}
+
 .shade {
+  z-index: 9;
   position: fixed;
   width: 100vw;
   height: 100vh;
@@ -7,7 +13,20 @@
   left: 0;
 }
 
+.canves-box1 {
+
+  /* text-align: center;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); */
+  position: fixed;
+  top: -99999999px;
+  left: -99999999px;
+}
+
 .canves-box {
+  text-align: center;
   position: fixed;
   top: 50%;
   left: 50%;
@@ -22,7 +41,7 @@
 }
 
 
-.canves-btn {
+.canves-btn {    margin-top: 40rpx;
   box-sizing: border-box;
   overflow: hidden;
   padding: 0 40rpx;
@@ -30,7 +49,7 @@
   line-height: 100rpx;
   width: 100vw;
   display: flex;
-  justify-content: space-between;
+  /* justify-content: space-between; */
 }
 
 .canves-btn view {
@@ -41,4 +60,5 @@
   width: 250rpx;
   color: white;
   background-color: rgb(7, 193, 96);
+  margin: 0 auto;
 }

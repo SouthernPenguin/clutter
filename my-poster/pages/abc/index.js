@@ -17,8 +17,14 @@ Page({
     hotIcon: '/img/icon.png',
     qrCode: '/img/QR.jpg',
     qrCodeNetWork: 'https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=2877499757,3239316825&fm=224&gp=0.jpg',
-    /*将网络图层转成本地临时地址*/
-    userHeaderInterim: ''
+    classInform: {
+      totalSles: 'test累计销售',
+      price: 'test99',
+      name: '课程名名字',
+      grab: '以抢',
+      label: '小标题',
+      slogan: '口号'
+    }
   },
   onReady: function () {
     this.drawImage()
@@ -331,17 +337,17 @@ Page({
     hotPhoto.src = myData.hotIcon
     hotPhoto.onload = (() => {
       myData.ctx.drawImage(hotPhoto, informText1X, inforBeginY + (65 / dpr.dprY), 15 / dpr.dprX, 18 / dpr.dprX)
-      let hotText2 = 20 /2
+      let hotText2 = 20 / 2
       myData.ctx.font = ` ${hotText2}px PingFang SC`; // 设置字体大小
       myData.ctx.fillStyle = "#D22410"; // 设置文字颜色
-      let hotText2X = canvasPaddingX + (54 / dpr.dprX) 
+      let hotText2X = canvasPaddingX + (54 / dpr.dprX)
       let hotText2Y = inforBeginY + (84 / dpr.dprY)
       myData.ctx.fillText('以抢98%', hotText2X, hotText2Y);
     })
 
- 
 
-    
+
+
     // let grabHeight = 36 / dpr.dprY
     // let grabBeginX = canvasPaddingX + (26 / dpr.dprX)
     // let grabBeginY = inforBeginY + (55 / dpr.dprY)

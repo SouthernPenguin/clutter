@@ -1,5 +1,32 @@
+import wxCommonAPI from '../../utils/wxCommonAPI'
 Component({
-  properties: {},
+  properties: {
+    userHeader: {
+      type: String,
+      defult: ''
+    },
+    cover: {
+      type: String,
+      defult: ''
+    },
+    classInform: {
+      type: Object,
+      defult: {}
+      // {
+      //   totalSles:'累计销售',
+      //   price:'价格',
+      //   name:'课程名字',
+      //   grab:'以抢',
+      //   label:'小标题',
+      //   slogan:'口号'
+      // }
+    },
+    QRcode: {
+      type: String,
+      defult: ''
+    }
+
+  },
   data: {
     isShow: false,
     /*必要数据*/
@@ -13,27 +40,106 @@ Component({
     canvas: '', // 操作的画布节点
     ctx: "", // 以2d模式，获取一个画布节点的上下文对象
     /*海报绘制参数*/
-    userHeader: 'https://thirdwx.qlogo.cn/mmopen/vi_32/PFaAUqJ9MibPgAL2Fsl6miaVtZqTxGrI09Ewsh6LibgI6IRhcsJGqy9ugOtTDTv1TdOUFnApmryYzngDSFlWnia4WA/132', ///img/1x3.png
-    cover: 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fattach.bbs.miui.com%2Fforum%2F201305%2F11%2F212813ql8v5igl9cjt8vmb.jpg&refer=http%3A%2F%2Fattach.bbs.miui.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1622943556&t=410e2aa589c10510150cd8ce627be71b',
+    // userHeader: '',
+    // cover: '',
     converInform: '/img/price.png',
     hotIcon: '/img/icon.png',
-    qrCode: '/img/QR.jpg',
-    qrCodeNetWork: 'https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=2877499757,3239316825&fm=224&gp=0.jpg',
+    // qrCode: '/img/QR.jpg',
+    // qrCodeNetWork: '',
     /*将网络图层转成本地临时地址*/
     userHeaderInterim: ''
   },
   methods: {
-    btn() {
+    draw() {
+      wxCommonAPI.showToast('加载中...', 'loading')
       this.setData({
         isShow: true
       }, () => {
         this.drawImage()
       })
-
+      let that = this
+      setTimeout(() => {
+        wx.canvasToTempFilePath({
+          x: 0,
+          y: 0,
+          width: that.data.domeW,
+          height: that.data.domeH,
+          destWidth: that.data.domeW,
+          destHeight: that.data.domeH,
+          canvas: that.data.canvas,
+          success(res) {
+            that.setData({
+              tempFilePath: res.tempFilePath
+            })
+          }
+        })
+        wxCommonAPI.hideToast()
+      }, 2000)
     },
-    close() {
+    // 保存海报
+    async savePoster() {
+      if (!this.data.tempFilePath) return
+      let msg = await this._savePoster()
+      const errMsgs = ["saveImageToPhotosAlbum:fail:auth denied",
+        "saveImageToPhotosAlbum:fail auth deny",
+        "saveImageToPhotosAlbum:fail authorize no response"
+      ]
+      const isErr = errMsgs.includes(msg)
+      if (isErr) {
+        wx.showModal({
+          title: '提示',
+          content: '需要您授权保存相册',
+          showCancel: true,
+          complete: res => {
+            if (res.confirm) this.openSetting()
+          }
+        })
+      } else {
+        this.setData({
+          isShow: false,
+          tempFilePath: ''
+        })
+      }
+    },
+    async _savePoster() {
+      let res = await new Promise((resolve, reject) => {
+        wx.saveImageToPhotosAlbum({
+          filePath: this.data.tempFilePath,
+          complete: msg => {
+            resolve(msg.errMsg)
+          }
+        })
+      })
+      return res
+    },
+    openSetting() {
+      new Promise((resolve, reject) => {
+        wx.openSetting({
+          complete: res => {
+            resolve(res)
+          }
+        })
+      }).then(res => {
+        console.log(res)
+        if (res.authSetting['scope.writePhotosAlbum']) {
+          wx.showModal({
+            title: '提示',
+            content: '获取权限成功,再次点击图片即可保存',
+            showCancel: false,
+          })
+        } else {
+          wx.showModal({
+            title: '提示',
+            content: '获取权限失败，将无法保存到相册哦~',
+            showCancel: false,
+          })
+        }
+      })
+    },
+    shade() {
       this.setData({
-        isShow: false
+        isShow: false,
+        tempFilePath: ''
       })
     },
     drawImage() {
@@ -61,6 +167,8 @@ Component({
           this.setData({
             canvas,
             ctx,
+            // domeW:750,
+            // domeH:1036,
             domeW: canvasRes[0].width,
             domeH: canvasRes[0].height,
             dpr,
@@ -193,9 +301,10 @@ Component({
         myData.ctx.drawImage(headerPhoto, canvasPadding.canvasPaddingX, canvasPadding.canvasPaddingY, headerHeight, headerHeight) //定位在圆圈范围内便会出现
         myData.ctx.restore()
       }
+
       // 文字绘制
       let headerName1 = 34 / 2
-      myData.ctx.font = `bold ${headerName1}px PingFang SC`; // 设置字体大小
+      myData.ctx.font = ` ${headerName1}px PingFang SC`; // 设置字体大小
       myData.ctx.fillStyle = "#130A0F"; // 设置文字颜色
       let headerName1X = canvasPadding.canvasPaddingX + headerHeight + (26 / dpr.dprX)
       let headerName1Y = canvasPadding.canvasPaddingY + (44 / dpr.dprY)
@@ -206,9 +315,11 @@ Component({
       myData.ctx.fillStyle = "#999B9D"; // 设置文字颜色
       let headerName2X = canvasPadding.canvasPaddingX + headerHeight + (26 / dpr.dprX)
       let headerName2Y = canvasPadding.canvasPaddingY + (80 / dpr.dprY)
-      myData.ctx.fillText('趣艺塘的课程', headerName2X, headerName2Y);
+      myData.ctx.fillText('XXXXX的课程', headerName2X, headerName2Y);
+
     },
     drawCover() {
+      wxCommonAPI.showToast('drawCover')
       const myData = this.data
       let {
         dpr,
@@ -234,9 +345,12 @@ Component({
       let coverRadius = 28 / dpr.dprY
       let coverBeginX = canvasPaddingX
       let coverBeginY = canvasPaddingY + headerHeightBottom + headerHeight
+
+
       let coverPhoto = myData.canvas.createImage();
       coverPhoto.src = myData.cover
       coverPhoto.onload = (() => {
+        wxCommonAPI.showToast('  coverPhoto.onload ')
         myData.ctx.save()
         this.drawCoverRoundedRect(myData.ctx, coverBeginX, coverBeginY, coverWidth, coverHeight, coverRadius)
         myData.ctx.clip()
@@ -245,6 +359,7 @@ Component({
         // 封面课程价，积累销售绘制
         this.drawCoverInform()
       })
+
     },
     // 封面课程价，积累销售绘制
     drawCoverInform() {
@@ -273,32 +388,34 @@ Component({
         myData.ctx.drawImage(converInformPhoto, converInformBeginX, converInformBeginY, coverInformWidth, coverInformHeight)
         // 累积销售1254 文字绘制
         let coverInformText1 = 28 / 2
-        myData.ctx.font = `Regular ${coverInformText1}px SourceHanSansSC-Regular`; // 设置字体大小
+        myData.ctx.font = ` ${coverInformText1}px SourceHanSansSC-Regular`; // 设置字体大小
         myData.ctx.fillStyle = "#fff"; // 设置文字颜色
         let coverInformText1X = canvasPaddingX + (26 / dpr.dprX)
         let coverInformText1Y = converInformBeginY + (115 / dpr.dprY)
-        myData.ctx.fillText('累积销售1254', coverInformText1X, coverInformText1Y);
+        // myData.ctx.fillText('累积销售1254', coverInformText1X, coverInformText1Y);
+        myData.ctx.fillText(myData.classInform.totalSles, coverInformText1X, coverInformText1Y);
         // 课程价 文字绘制
         let coverInformText2 = 24 / 2
-        myData.ctx.font = `Regular ${coverInformText2}px SourceHanSansSC-Regular`; // 设置字体大小
+        myData.ctx.font = ` ${coverInformText2}px SourceHanSansSC-Regular`; // 设置字体大小
         myData.ctx.fillStyle = "#fff"; // 设置文字颜色
         let coverInformText2X = coverInformWidth - (120 / dpr.dprY)
         let coverInformText2Y = converInformBeginY + (50 / dpr.dprY)
         myData.ctx.fillText('课程价', coverInformText2X, coverInformText2Y);
         // ￥ 文字绘制
         let coverInformText3 = 34 / 2
-        myData.ctx.font = `Regular ${coverInformText3}px SourceHanSansSC-Regular`; // 设置字体大小
+        myData.ctx.font = ` ${coverInformText3}px SourceHanSansSC-Regular`; // 设置字体大小
         myData.ctx.fillStyle = "#fff"; // 设置文字颜色
         let coverInformText3X = coverInformWidth - (160 / dpr.dprY)
         let coverInformText3Y = converInformBeginY + (115 / dpr.dprY)
         myData.ctx.fillText('￥', coverInformText3X, coverInformText3Y);
         // 价格文字绘制
         let coverInformText4 = 48 / 2
-        myData.ctx.font = `Bold ${coverInformText4}px SourceHanSansSC-Regular`; // 设置字体大小
+        myData.ctx.font = ` ${coverInformText4}px SourceHanSansSC-Regular`; // 设置字体大小
         myData.ctx.fillStyle = "#fff"; // 设置文字颜色
         let coverInformText4X = coverInformWidth - (130 / dpr.dprY)
         let coverInformText4Y = converInformBeginY + (115 / dpr.dprY)
-        myData.ctx.fillText('999.00', coverInformText4X, coverInformText4Y);
+        myData.ctx.fillText(myData.classInform.price, coverInformText4X, coverInformText4Y);
+        // myData.ctx.fillText('999.00', coverInformText4X, coverInformText4Y);
       })
     },
     // 课程信息
@@ -333,11 +450,19 @@ Component({
 
       // 周末钢琴体验课周末钢琴体验课周末钢琴 课程名称文字绘制
       let informText1 = 34 / 2
-      myData.ctx.font = `Bold ${informText1}px PingFang SC`; // 设置字体大小
+      myData.ctx.font = ` ${informText1}px PingFang SC`; // 设置字体大小
       myData.ctx.fillStyle = "#130A0F"; // 设置文字颜色
       let informText1X = canvasPaddingX + (26 / dpr.dprX)
       let informText1Y = inforBeginY + (44 / dpr.dprY)
-      myData.ctx.fillText('周末钢琴体验课周末钢琴体验课周末钢琴', informText1X, informText1Y);
+
+      let _name = myData.classInform.name
+      let sliceName = ''
+      if (_name.length >= 17) {
+        sliceName = _name.slice(0, 17) + '...'
+      } else {
+        sliceName = _name
+      }
+      myData.ctx.fillText(sliceName, informText1X, informText1Y);
 
       // 以抢xxx%
       let hotPhoto = myData.canvas.createImage();
@@ -349,7 +474,7 @@ Component({
         myData.ctx.fillStyle = "#D22410"; // 设置文字颜色
         let hotText2X = canvasPaddingX + (54 / dpr.dprX)
         let hotText2Y = inforBeginY + (84 / dpr.dprY)
-        myData.ctx.fillText('以抢98%', hotText2X, hotText2Y);
+        myData.ctx.fillText(myData.classInform.grab, hotText2X, hotText2Y);
       })
 
 
@@ -374,7 +499,7 @@ Component({
       myData.ctx.fillStyle = "#4C4D55"; // 设置文字颜色
       let informText2X = canvasPaddingX + (38 / dpr.dprX) + grabWidth
       let informText2Y = inforBeginY + (84 / dpr.dprY)
-      myData.ctx.fillText('精选琴谱免费送', informText2X, informText2Y);
+      myData.ctx.fillText(myData.classInform.label, informText2X, informText2Y);
     },
     // 下部分
     drawingBottom() {
@@ -399,20 +524,20 @@ Component({
       myData.ctx.fillRect(beginX, beginY, width, height)
       myData.ctx.restore();
 
-      // 趣艺塘文字绘制
+      // XXXXX文字绘制
       let headerName1 = 48 / 2
       myData.ctx.font = ` ${headerName1}px PingFang SC`; // 设置字体大小
       myData.ctx.fillStyle = "#130A0F"; // 设置文字颜色
-      myData.ctx.fillText('趣艺塘', beginX + (26 / dpr.dprY), beginY + (100 / dpr.dprY));
-      // 趣艺塘文字绘制
+      myData.ctx.fillText('XXXXX', beginX + (26 / dpr.dprY), beginY + (100 / dpr.dprY));
+      // XXXXX文字绘制
       let headerName2 = 28 / 2
       myData.ctx.font = ` ${headerName2}px PingFang SC`; // 设置字体大小
       myData.ctx.fillStyle = "#999B9D"; // 设置文字颜色
-      myData.ctx.fillText('口号口号口号', beginX + (26 / dpr.dprY), beginY + (160 / dpr.dprY));
+      myData.ctx.fillText(myData.classInform.slogan, beginX + (26 / dpr.dprY), beginY + (160 / dpr.dprY));
 
       //绘制二维码
       const QRPhoto = myData.canvas.createImage();
-      QRPhoto.src = myData.qrCode
+      QRPhoto.src = myData.QRcode
       QRPhoto.onload = (() => {
         myData.ctx.drawImage(QRPhoto, beginX + (482 / dpr.dprX), beginY + (32 / dpr.dprY), 160 / dpr.dprY, 160 / dpr.dprY)
       })
